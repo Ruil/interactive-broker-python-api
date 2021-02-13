@@ -13,4 +13,4 @@ zip_file_content = zipfile.ZipFile(io.BytesIO(response.content))
 download_folder = pathlib.Path(__file__).parent.joinpath('clientportal.beta.gw').resolve()
 
 # Extract the Content to the new folder.
-zip_file_content.extractall(path="/clientportal.beta.gw")
+zip_file_content.extractall(path="../clientportal.beta.gw")
