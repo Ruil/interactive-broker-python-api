@@ -3,7 +3,7 @@ import pathlib
 import sched
 import time
 
-from ibw.client import IBClient
+from ibw.authorization import IBClient
 from configparser import ConfigParser
 
 MARKET_CLOSE = datetime.time(16, 0)
