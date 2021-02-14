@@ -182,8 +182,8 @@ class IBClient:
         ----
         str: The Server Process ID.
         """
-
-        IB_WEB_API_PROC = ["sh", r"bin\run.bat", r"root\conf.yaml"]
+        ib_lib_path = 'clientportal.beta.gw'
+        IB_WEB_API_PROC = ["sh", ib_lib_path + r"/bin/run.bat", ib_lib_path + r"/root/conf.yaml"]
         self.server_process = subprocess.Popen(
             args=IB_WEB_API_PROC,
             cwd=self.client_portal_folder
