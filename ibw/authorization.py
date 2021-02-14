@@ -1,30 +1,13 @@
 import logging
 import pathlib
 import socket
-import ssl
 import subprocess
 import sys
 import textwrap
-import urllib
 from typing import Dict
 
-import requests
-import urllib3
-from urllib3.exceptions import InsecureRequestWarning
-
+import client_utils
 from ibw.clientportal import ClientPortal
-
-urllib3.disable_warnings(category=InsecureRequestWarning)
-# http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
-
-try:
-    _create_unverified_https_context = ssl._create_unverified_context
-except AttributeError:
-    # Legacy Python that doesn't verify HTTPS certificates by default
-    pass
-else:
-    # Handle target environment that doesn't support HTTPS verification
-    ssl._create_default_https_context = _create_unverified_https_context
 
 logging.basicConfig(
     filename='app.log',
@@ -34,13 +17,12 @@ logging.basicConfig(
 
 
 def get_localhost_name_ip():
-    return socket.gethostbyname(socket.gethostname()+'.local')
+    return socket.gethostbyname(socket.gethostname() + '.local')
 
 
 class IBClient:
 
-    def __init__(self, username: str, account: str, client_gateway_path: str = None,
-                 is_server_running: bool = True) -> None:
+    def __init__(self, username: str, account: str, client_gateway_path: str = None) -> None:
         """Initalizes a new instance of the IBClient Object.
 
         Arguments:
@@ -75,7 +57,6 @@ class IBClient:
         self._operating_system = sys.platform
         self.session_state_path: pathlib.Path = pathlib.Path(__file__).parent.joinpath('server_session.json').resolve()
         self.authenticated = False
-        self._is_server_running = is_server_running
         self.server_process = None
 
         # Define URL Components
@@ -286,11 +267,11 @@ class IBClient:
 
         max_retries = 0
         while (max_retries > 4 or self.authenticated == False):
-        
+
             if max_retries > 10:
                 print("Connect failed.")
                 sys.exit()
-                
+
             auth_response = self.is_authenticated(check=True)
 
             # Log the Auth Response.
@@ -301,7 +282,7 @@ class IBClient:
 
             if 'statusCode' in auth_response.keys() and auth_response['statusCode'] == 401:
                 print("Session isn't connected, closing script.")
-                self.close_session()
+                sys.exit()
 
             elif 'authenticated' in auth_response.keys() and auth_response['authenticated'] == True:
                 self.authenticated = True
@@ -364,10 +345,13 @@ class IBClient:
         else:
             req_type = 'GET'
 
-        content = self._make_request(
+        content = client_utils._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            headers='none'
+            headers='none',
+            localhost_ip=self.localhost_ip,
+            ib_gateway_path=self.ib_gateway_path,
+            api_version=self.api_version
         )
 
         return content
@@ -391,9 +375,12 @@ class IBClient:
         req_type = 'POST'
 
         # Make the request.
-        content = self._make_request(
+        content = client_utils._make_request(
             endpoint=endpoint,
-            req_type=req_type
+            req_type=req_type,
+            localhost_ip=self.localhost_ip,
+            ib_gateway_path=self.ib_gateway_path,
+            api_version=self.api_version
         )
 
         return content
@@ -404,9 +391,12 @@ class IBClient:
         # define request components
         endpoint = r'sso/validate'
         req_type = 'GET'
-        content = self._make_request(
+        content = client_utils._make_request(
             endpoint=endpoint,
-            req_type=req_type
+            req_type=req_type,
+            localhost_ip=self.localhost_ip,
+            ib_gateway_path=self.ib_gateway_path,
+            api_version=self.api_version
         )
 
         return content
@@ -422,134 +412,12 @@ class IBClient:
         # define request components
         endpoint = 'iserver/accounts'
         req_type = 'GET'
-        content = self._make_request(
+        content = client_utils._make_request(
             endpoint=endpoint,
-            req_type=req_type
+            req_type=req_type,
+            localhost_ip=self.localhost_ip,
+            ib_gateway_path=self.ib_gateway_path,
+            api_version=self.api_version
         )
 
         return content
-
-    def _headers(self, mode: str = 'json') -> Dict:
-        """Builds the headers.
-
-        Returns a dictionary of default HTTP headers for calls to Interactive 
-        Brokers API, in the headers we defined the Authorization and access 
-        token.
-
-        Arguments:
-        ----
-        mode {str} -- Defines the content-type for the headers dictionary.
-            default is 'json'. Possible values are ['json','form']
-
-        Returns:
-        ----
-        Dict
-        """
-        headers = None
-        if mode == 'json':
-            headers = {
-                'Content-Type': 'application/json'
-            }
-        elif mode == 'form':
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        elif mode == 'none':
-            headers = None
-
-        return headers
-
-    def _build_url(self, endpoint: str) -> str:
-        """Builds a url for a request.
-
-        Arguments:
-        ----
-        endpoint {str} -- The URL that needs conversion to a full endpoint URL.
-
-        Returns:
-        ----
-        {srt} -- A full URL path.
-        """
-
-        # otherwise build the URL
-        return urllib.parse.unquote(
-            urllib.parse.urljoin(
-                self.ib_gateway_path,
-                self.api_version
-            ) + r'portal/' + endpoint
-        )
-
-    def _make_request(self, endpoint: str, req_type: str, headers: str = 'json', params: dict = None, data: dict = None,
-                      json: dict = None) -> Dict:
-        """Handles the request to the client.
-
-        Handles all the requests made by the client and correctly organizes
-        the information so it is sent correctly. Additionally it will also
-        build the URL.
-
-        Arguments:
-        ----
-        endpoint {str} -- The endpoint we wish to request.
-
-        req_type {str} --  Defines the type of request to be made. Can be one of four
-            possible values ['GET','POST','DELETE','PUT']
-
-        params {dict} -- Any arguments that are to be sent along in the request. That
-            could be parameters of a 'GET' request, or a data payload of a
-            'POST' request.
-
-        Returns:
-        ----
-        {Dict} -- A response dictionary.
-
-        """
-        # First build the url.
-        url = self._build_url(endpoint=endpoint)
-
-        # Define the headers.
-        headers = self._headers(mode=headers)
-
-        # Make the request.
-        if req_type == 'POST':
-            response = requests.post(url=url, headers=headers, params=params, json=json, verify=False)
-        elif req_type == 'GET':
-            response = requests.get(url=url, headers=headers, params=params, json=json, verify=False)
-        elif req_type == 'DELETE':
-            response = requests.delete(url=url, headers=headers, params=params, json=json, verify=False)
-
-        # grab the status code
-        status_code = response.status_code
-
-        # grab the response headers.
-        response_headers = response.headers
-
-        # Check to see if it was successful
-        if response.ok:
-
-            if response_headers.get('Content-Type', 'null') == 'application/json;charset=utf-8':
-                data = response.json()
-            else:
-                data = response.json()
-
-            # Log it.
-            logging.debug('''
-            Response Text: {resp_text}
-            Response URL: {resp_url}
-            Response Code: {resp_code}
-            Response JSON: {resp_json}
-            Response Headers: {resp_headers}
-            '''.format(
-                resp_text=response.text,
-                resp_url=response.url,
-                resp_code=status_code,
-                resp_json=data,
-                resp_headers=response_headers
-            )
-            )
-
-            return data
-
-        # if it was a bad request print it out.
-        elif not response.ok and url != 'https://' + self.localhost_ip + ':5000/v1/portal/iserver/account':
-            print(url)
-            raise requests.HTTPError()

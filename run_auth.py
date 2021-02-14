@@ -19,14 +19,11 @@ config.read(file_path)
 account = config.get('main', 'REGULAR_ACCOUNT')
 username = config.get('main', 'REGULAR_USERNAME')
 
-print(account)
-print(aa)
 
 # Create a new session of the IB Web API.
 ib_client = IBClient(
     username=username,
-    account=account,
-    is_server_running=True
+    account=account
 )
 
 # create a new session
