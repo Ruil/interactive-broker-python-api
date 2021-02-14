@@ -76,7 +76,8 @@ class IBClient:
         self.session_state_path: pathlib.Path = pathlib.Path(__file__).parent.joinpath('server_session.json').resolve()
         self.authenticated = False
         self._is_server_running = is_server_running
-
+	self.server_process = None
+	
         # Define URL Components
         self.localhost_ip = get_localhost_name_ip()
         ib_gateway_host = r"https://" + self.localhost_ip
