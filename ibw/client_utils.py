@@ -2,13 +2,16 @@ import logging
 import urllib
 from typing import Dict
 
+import socket
 import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 
 urllib3.disable_warnings(category=InsecureRequestWarning)
 
-
+def get_localhost_name_ip():
+    return socket.gethostbyname(socket.gethostname() + '.local')
+    
 def _headers(mode: str = 'json') -> Dict:
     """Builds the headers.
 

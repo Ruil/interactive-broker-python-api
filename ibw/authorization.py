@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import socket
 import subprocess
 import sys
 import textwrap
@@ -14,10 +13,6 @@ logging.basicConfig(
     format='%(levelname)s - %(name)s - %(message)s',
     level=logging.DEBUG
 )
-
-
-def get_localhost_name_ip():
-    return socket.gethostbyname(socket.gethostname() + '.local')
 
 
 class IBClient:
@@ -60,7 +55,7 @@ class IBClient:
         self.server_process = None
 
         # Define URL Components
-        self.localhost_ip = get_localhost_name_ip()
+        self.localhost_ip = client_utils.get_localhost_name_ip()
         ib_gateway_host = r"https://" + self.localhost_ip
         ib_gateway_port = r"5000"
         self.ib_gateway_path = ib_gateway_host + ":" + ib_gateway_port
