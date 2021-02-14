@@ -286,7 +286,11 @@ class IBClient:
 
         max_retries = 0
         while (max_retries > 4 or self.authenticated == False):
-
+        
+            if max_retries > 10:
+                print("Connect failed.")
+                sys.exit()
+                
             auth_response = self.is_authenticated(check=True)
 
             # Log the Auth Response.
@@ -307,7 +311,9 @@ class IBClient:
                 valid_resp = self.validate()
                 reauth_resp = self.reauthenticate()
                 auth_response = self.is_authenticated()
-
+                print('valid_resp: ', valid_resp)
+                print('reauth: ', reauth_resp)
+                print('auth_response: ', auth_response)
                 try:
                     serv_resp = self.server_accounts()
                     if 'accounts' in serv_resp:
