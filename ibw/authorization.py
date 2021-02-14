@@ -34,7 +34,7 @@ logging.basicConfig(
 
 
 def get_localhost_name_ip():
-    return socket.gethostbyname(socket.gethostname())
+    return socket.gethostbyname(socket.gethostname()+'.local')
 
 
 class IBClient:
@@ -256,13 +256,16 @@ class IBClient:
             The Interactive Broker server is currently starting up, so we can authenticate your session.
                 STEP 1: GO TO THE FOLLOWING URL: {url}
                 STEP 2: LOGIN TO YOUR account WITH YOUR username AND PASSWORD.
-                STEP 3: WHEN YOU SEE `Client login succeeds` RETURN BACK TO THE TERMINAL AND TYPE `YES` TO CHECK IF THE SESSION IS AUTHENTICATED.
+                STEP 3: WHEN YOU SEE `Client login succeeds` RETURN BACK TO THE TERMINAL AND TYPE `ENTER` TO CHECK IF THE SESSION IS AUTHENTICATED.
             {lin_brk}""".format(
                 lin_brk='-' * 80,
                 url=self.login_gateway_path
             )
             )
             )
+            user_input = input(
+                'Would you like to make an authenticated request (Press ENTER)? '
+            ).upper()
 
             # Check the auth status
             auth_status = self._check_authentication_user_input()
