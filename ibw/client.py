@@ -11,6 +11,7 @@ import pathlib
 import requests
 import textwrap
 import subprocess
+import socket 
 
 from typing import Union
 from typing import List
@@ -37,6 +38,10 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
+
+def get_localhost_name_ip(): 
+     return socket.gethostbyname(socket.gethostname()) 
+        
 
 class IBClient():
 
@@ -76,9 +81,10 @@ class IBClient():
         self.session_state_path: pathlib.Path = pathlib.Path(__file__).parent.joinpath('server_session.json').resolve()
         self.authenticated = False
         self._is_server_running = is_server_running
-
+        
         # Define URL Components
-        ib_gateway_host = r"https://localhost"
+        self.localhost_ip = get_localhost_name_ip()        
+        ib_gateway_host = r"https://" + self.localhost_ip
         ib_gateway_port = r"5000"
         self.ib_gateway_path = ib_gateway_host + ":" + ib_gateway_port
         self.backup_gateway_path = r"https://cdcdyn.interactivebrokers.com/portal.proxy"
@@ -500,35 +506,6 @@ class IBClient():
             else:
                 self.authenticated = False
 
-    def _start_server(self) -> str:
-        """Starts the Server.
-
-        Returns:
-        ----
-        str: The Server Process ID.
-        """
-
-        # windows will use the command line application.
-        if self._operating_system == 'win32':
-            IB_WEB_API_PROC = ["cmd", "/k", r"bin\run.bat", r"root\conf.yaml"]
-            self.server_process = subprocess.Popen(
-                args=IB_WEB_API_PROC,
-                cwd=self.client_portal_folder,
-                creationflags=subprocess.CREATE_NEW_CONSOLE
-            ).pid
-
-        # mac will use the terminal.
-        elif self._operating_system == 'darwin':
-            IB_WEB_API_PROC = [
-                "open", "-F", "-a",
-                "Terminal", r"bin/run.sh", r"root/conf.yaml"
-            ]
-            self.server_process = subprocess.Popen(
-                args=IB_WEB_API_PROC,
-                cwd=self.client_portal_folder
-            ).pid
-
-        return self.server_process
 
     def connect(self, start_server: bool = True, check_user_input: bool = True) -> bool:
         """Connects the session with the API.
@@ -719,7 +696,7 @@ class IBClient():
             return data
 
         # if it was a bad request print it out.
-        elif not response.ok and url != 'https://localhost:5000/v1/portal/iserver/account':
+        elif not response.ok and url != 'https://'+ self.localhost_ip + ':5000/v1/portal/iserver/account':
             print(url)
             raise requests.HTTPError()
 
