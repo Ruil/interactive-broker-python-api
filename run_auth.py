@@ -24,8 +24,8 @@ print(aa)
 
 # Create a new session of the IB Web API.
 ib_client = IBClient(
-    username=paper_username,
-    account=paper_account,
+    username=username,
+    account=account,
     is_server_running=True
 )
 
