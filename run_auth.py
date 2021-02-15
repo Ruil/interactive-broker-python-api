@@ -52,6 +52,7 @@ def renew_session(scheduler):
     print('scheduled next run in: ', RENEW_DELAY, ' s')
     scheduler.enter(
         RENEW_DELAY,
+        PRIORITY,        
         renew_session,
         argument=(scheduler,))
 
