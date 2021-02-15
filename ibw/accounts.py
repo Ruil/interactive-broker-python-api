@@ -1,6 +1,6 @@
 from typing import Dict
 
-import client_base
+import ibw.client_base as client_base
 
 
 class IBAccounts(client_base.IBBase):

@@ -6,7 +6,7 @@ import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 
-import client_utils
+import ibw.client_utils as client_utils
 
 urllib3.disable_warnings(category=InsecureRequestWarning)
 

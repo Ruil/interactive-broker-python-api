@@ -1,7 +1,7 @@
 from typing import Dict
 from typing import List
 
-import client_base
+import ibw.client_base as client_base
 
 
 class IBOrder(client_base.IBBase):

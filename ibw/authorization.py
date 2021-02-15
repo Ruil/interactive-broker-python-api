@@ -7,7 +7,7 @@ import sys
 import textwrap
 from typing import Dict
 
-import client_base
+import ibw.client_base as client_base
 from ibw.clientportal import ClientPortal
 
 logging.basicConfig(
