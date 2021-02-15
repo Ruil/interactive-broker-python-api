@@ -29,6 +29,27 @@ class IBBase:
         self.ib_gateway_path = ib_gateway_host + ":" + ib_gateway_port
         self.backup_gateway_path = r"https://cdcdyn.interactivebrokers.com/portal.proxy"
         self.login_gateway_path = self.ib_gateway_path + "/sso/Login?forwardTo=22&RL=1&ip2loc=on"
+        
+    def symbol_search(self, symbol: str) -> Dict:
+        """
+            Performs a symbol search for a given symbol and returns 
+            information related to the symbol including the contract id.
+        """
+
+        # define the request components
+        endpoint = 'iserver/secdef/search'
+        req_type = 'POST'
+        payload = {
+            'symbol': symbol
+        }
+
+        content = self._make_request(
+            endpoint=endpoint,
+            req_type=req_type,
+            json=payload
+        )
+
+        return content        
 
     def _headers(self, mode: str = 'json') -> Dict:
         """Builds the headers.
