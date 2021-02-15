@@ -265,7 +265,7 @@ class IBClient:
 
             if max_retries > 10:
                 print("Connect failed.")
-                sys.exit()
+                self.close_session()
 
             auth_response = self.is_authenticated(check=True)
 
@@ -277,7 +277,7 @@ class IBClient:
 
             if 'statusCode' in auth_response.keys() and auth_response['statusCode'] == 401:
                 print("Session isn't connected, closing script.")
-                sys.exit()
+                self.close_session()
 
             elif 'authenticated' in auth_response.keys() and auth_response['authenticated'] == True:
                 self.authenticated = True
@@ -317,6 +317,22 @@ class IBClient:
             max_retries += 1
 
         return self.authenticated
+
+    def close_session(self) -> None:
+        """Closes the current session and kills the server using Taskkill."""
+
+        print('\nCLOSING SERVER AND EXITING SCRIPT.')
+
+        # Define the process.
+        process = "TASKKILL /F /PID {proc_id} /T".format(
+            proc_id=self.server_process
+        )
+
+        # Kill the process.
+        subprocess.call(process, creationflags=subprocess.DETACHED_PROCESS)
+
+        # and exit.
+        sys.exit()
 
     def is_authenticated(self, check: bool = False) -> Dict:
         """Checks if session is authenticated.
