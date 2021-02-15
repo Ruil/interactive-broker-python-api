@@ -62,6 +62,6 @@ scheduler.enter(
     RENEW_DELAY,
     PRIORITY,
     renew_session,
-    (scheduler))
+    argument=(scheduler,))
 
 scheduler.run()
