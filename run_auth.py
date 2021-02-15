@@ -53,7 +53,7 @@ def renew_session(scheduler):
     scheduler.enter(
         RENEW_DELAY,
         renew_session,
-        scheduler)
+        argument=(scheduler,))
 
 
 scheduler = sched.scheduler(time.time, time.sleep)
