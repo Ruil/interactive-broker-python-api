@@ -199,7 +199,9 @@ class IBClient:
                 )
 
                 print(success)
-                return True
+            else:
+                print('Account NOT found.')
+            return True
         else:
             print(failure)
             return False
