@@ -1,5 +1,7 @@
 import logging
+import os
 import pathlib
+import signal
 import subprocess
 import sys
 import textwrap
@@ -318,13 +320,8 @@ class IBClient(client_base.IBBase):
 
         print('\nCLOSING SERVER AND EXITING SCRIPT.')
 
-        # Define the process.
-        process = "TASKKILL /F /PID {proc_id} /T".format(
-            proc_id=self.server_process
-        )
-
         # Kill the process.
-        subprocess.call(process, creationflags=subprocess.DETACHED_PROCESS)
+        os.kill(self.server_process, signal.SIGTERM)
 
         # and exit.
         sys.exit()
