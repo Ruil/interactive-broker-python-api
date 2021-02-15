@@ -5,7 +5,7 @@ import sys
 import textwrap
 from typing import Dict
 
-import ibw.client_utils as client_utils
+import ibw.client_base as client_base
 from ibw.clientportal import ClientPortal
 
 logging.basicConfig(
@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 
-class IBClient:
+class IBClient(client_base.IBBase):
 
     def __init__(self, username: str, account: str, client_gateway_path: str = None) -> None:
         """Initalizes a new instance of the IBClient Object.
@@ -44,23 +44,16 @@ class IBClient:
             >>> ib_regular_session
         """
 
+        super().__init__()
+
         self.account = account
         self.username = username
         self.client_portal_client = ClientPortal()
 
-        self.api_version = 'v1/'
         self._operating_system = sys.platform
         self.session_state_path: pathlib.Path = pathlib.Path(__file__).parent.joinpath('server_session.json').resolve()
         self.authenticated = False
         self.server_process = None
-
-        # Define URL Components
-        self.localhost_ip = client_utils.get_localhost_name_ip()
-        ib_gateway_host = r"https://" + self.localhost_ip
-        ib_gateway_port = r"5000"
-        self.ib_gateway_path = ib_gateway_host + ":" + ib_gateway_port
-        self.backup_gateway_path = r"https://cdcdyn.interactivebrokers.com/portal.proxy"
-        self.login_gateway_path = self.ib_gateway_path + "/sso/Login?forwardTo=22&RL=1&ip2loc=on"
 
         if client_gateway_path is None:
 
@@ -358,13 +351,10 @@ class IBClient:
         else:
             req_type = 'GET'
 
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
             headers='none',
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -388,12 +378,10 @@ class IBClient:
         req_type = 'POST'
 
         # Make the request.
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
+
         )
 
         return content
@@ -404,12 +392,9 @@ class IBClient:
         # define request components
         endpoint = r'sso/validate'
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -425,12 +410,9 @@ class IBClient:
         # define request components
         endpoint = 'iserver/accounts'
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content

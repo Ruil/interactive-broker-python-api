@@ -33,6 +33,7 @@ ib_client.create_session()
 def renew_session(scheduler):
     if datetime.datetime.now().time() >= MARKET_CLOSE:
         print('Market is closed, exit.')
+        ib_client.close_session()
         return
 
     valid_resp = ib_client.validate()

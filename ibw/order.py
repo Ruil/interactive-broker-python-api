@@ -1,28 +1,13 @@
-import logging
 from typing import Dict
 from typing import List
 
-import ibw.client_utils as client_utils
-
-logging.basicConfig(
-    filename='app.log',
-    format='%(levelname)s - %(name)s - %(message)s',
-    level=logging.DEBUG
-)
+import ibw.client_base as client_base
 
 
-class IBOrder:
+class IBOrder(client_base.IBBase):
 
     def __init__(self) -> None:
-        self.api_version = 'v1/'
-
-        # Define URL Components
-        self.localhost_ip = client_utils.get_localhost_name_ip()
-        ib_gateway_host = r"https://" + self.localhost_ip
-        ib_gateway_port = r"5000"
-        self.ib_gateway_path = ib_gateway_host + ":" + ib_gateway_port
-        self.backup_gateway_path = r"https://cdcdyn.interactivebrokers.com/portal.proxy"
-        self.login_gateway_path = self.ib_gateway_path + "/sso/Login?forwardTo=22&RL=1&ip2loc=on"
+        super().__init__()
 
     def get_live_orders(self):
         """
@@ -36,12 +21,9 @@ class IBOrder:
         # define request components
         endpoint = r'iserver/account/orders'
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -70,12 +52,9 @@ class IBOrder:
         # define request components
         endpoint = r'iserver/account/{}/order'.format(account_id)
         req_type = 'POST'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version,
             json=order
         )
 
@@ -104,12 +83,9 @@ class IBOrder:
         # define request components
         endpoint = r'iserver/account/{}/orders'.format(account_id)
         req_type = 'POST'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version,
             json=orders
         )
 
@@ -137,12 +113,9 @@ class IBOrder:
         # define request components
         endpoint = r'iserver/account/{}/order/whatif'.format(account_id)
         req_type = 'POST'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version,
             json=order
         )
 
@@ -169,12 +142,9 @@ class IBOrder:
             'confirmed': reply
         }
 
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version,
             json=reply
         )
 
@@ -207,12 +177,9 @@ class IBOrder:
         endpoint = r'iserver/account/{}/order/{}'.format(
             account_id, customer_order_id)
         req_type = 'POST'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version,
             json=order
         )
 
@@ -234,12 +201,9 @@ class IBOrder:
         endpoint = r'iserver/account/{}/order/{}'.format(
             account_id, customer_order_id)
         req_type = 'DELETE'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version,
         )
 
         return content

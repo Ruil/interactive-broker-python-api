@@ -1,27 +1,12 @@
-import logging
 from typing import Dict
 
-import ibw.client_utils as client_utils
-
-logging.basicConfig(
-    filename='app.log',
-    format='%(levelname)s - %(name)s - %(message)s',
-    level=logging.DEBUG
-)
+import ibw.client_base as client_base
 
 
-class IBAccounts:
+class IBAccounts(client_base.IBBase):
 
     def __init__(self) -> None:
-        self.api_version = 'v1/'
-
-        # Define URL Components
-        self.localhost_ip = client_utils.get_localhost_name_ip()
-        ib_gateway_host = r"https://" + self.localhost_ip
-        ib_gateway_port = r"5000"
-        self.ib_gateway_path = ib_gateway_host + ":" + ib_gateway_port
-        self.backup_gateway_path = r"https://cdcdyn.interactivebrokers.com/portal.proxy"
-        self.login_gateway_path = self.ib_gateway_path + "/sso/Login?forwardTo=22&RL=1&ip2loc=on"
+        super().__init__()
 
     def server_accounts(self):
         """
@@ -34,12 +19,9 @@ class IBAccounts:
         # define request components
         endpoint = 'iserver/accounts'
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -57,12 +39,9 @@ class IBAccounts:
         # define request components
         endpoint = 'portfolio/accounts'
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -79,12 +58,9 @@ class IBAccounts:
         # define request components
         endpoint = r'​portfolio/subaccounts'
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -104,12 +80,9 @@ class IBAccounts:
         # define request components
         endpoint = r'portfolio/{}/meta'.format(account_id)
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -129,10 +102,7 @@ class IBAccounts:
         # define request components
         endpoint = r'portfolio/{}/summary'.format(account_id)
         req_type = 'GET'
-        content = client_utils._make_request(endpoint=endpoint, req_type=req_type,
-                                             localhost_ip=self.localhost_ip,
-                                             ib_gateway_path=self.ib_gateway_path,
-                                             api_version=self.api_version)
+        content = self._make_request(endpoint=endpoint, req_type=req_type, )
 
         return content
 
@@ -151,12 +121,9 @@ class IBAccounts:
         # define request components
         endpoint = r'portfolio/{}/ledger'.format(account_id)
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -182,12 +149,9 @@ class IBAccounts:
         # define request components
         endpoint = r'portfolio/{}/positions/{}'.format(account_id, page_id)
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -211,12 +175,9 @@ class IBAccounts:
         # Define request components.
         endpoint = r'portfolio/{}/position/{}'.format(account_id, conid)
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
@@ -236,12 +197,9 @@ class IBAccounts:
         # Define request components.
         endpoint = r'portfolio/positions/{}'.format(conid)
         req_type = 'GET'
-        content = client_utils._make_request(
+        content = self._make_request(
             endpoint=endpoint,
             req_type=req_type,
-            localhost_ip=self.localhost_ip,
-            ib_gateway_path=self.ib_gateway_path,
-            api_version=self.api_version
         )
 
         return content
