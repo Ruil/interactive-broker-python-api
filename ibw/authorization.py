@@ -7,8 +7,8 @@ import sys
 import textwrap
 from typing import Dict
 
-import client_base
-from clientportal import ClientPortal
+from . import client_base
+from . import clientportal
 
 logging.basicConfig(
     filename='app.log',
@@ -50,7 +50,7 @@ class IBClient(client_base.IBBase):
 
         self.account = account
         self.username = username
-        self.client_portal_client = ClientPortal()
+        self.client_portal_client = clientportal.ClientPortal()
 
         self._operating_system = sys.platform
         self.session_state_path: pathlib.Path = pathlib.Path(__file__).parent.joinpath('server_session.json').resolve()
