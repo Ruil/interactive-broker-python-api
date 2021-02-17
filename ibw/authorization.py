@@ -260,7 +260,7 @@ class IBClient(client_base.IBBase):
         max_retries = 0
         while (max_retries > 4 or self.authenticated == False):
 
-            if max_retries > 10:
+            if max_retries > 20:
                 print("Connect failed.")
                 self.close_session()
 
