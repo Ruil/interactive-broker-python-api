@@ -2,9 +2,9 @@ import datetime
 import pathlib
 import sched
 import time
+from configparser import ConfigParser
 
 from ibw.authorization import IBClient
-from configparser import ConfigParser
 
 MARKET_CLOSE = datetime.time(16, 0)
 RENEW_DELAY = 60
@@ -18,7 +18,6 @@ config.read(file_path)
 # Load the details.
 account = config.get('main', 'REGULAR_ACCOUNT')
 username = config.get('main', 'REGULAR_USERNAME')
-
 
 # Create a new session of the IB Web API.
 ib_client = IBClient(
@@ -36,23 +35,26 @@ def renew_session(scheduler):
         ib_client.close_session()
         return
 
-    valid_resp = ib_client.validate()
-    reauth_resp = ib_client.reauthenticate()
-    auth_response = ib_client.is_authenticated()
-    print(
-        '''
-        Validate Response: {valid_resp}
-        Reauth Response: {reauth_resp}
-        '''.format(
-            valid_resp=valid_resp,
-            reauth_resp=reauth_resp
+    try:
+        valid_resp = ib_client.validate()
+        reauth_resp = ib_client.reauthenticate()
+        auth_response = ib_client.is_authenticated()
+        print(
+            '''
+            Validate Response: {valid_resp}
+            Reauth Response: {reauth_resp}
+            '''.format(
+                valid_resp=valid_resp,
+                reauth_resp=reauth_resp
+            )
         )
-    )
+    except Exception as e:
+        print('Exception: ', str(e), '\n')
 
     print('scheduled next run in: ', RENEW_DELAY, ' s')
     scheduler.enter(
         RENEW_DELAY,
-        PRIORITY,        
+        PRIORITY,
         renew_session,
         argument=(scheduler,))
 
