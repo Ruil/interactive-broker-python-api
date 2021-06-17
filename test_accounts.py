@@ -6,4 +6,4 @@ print(my_accounts.server_accounts())
 
 print(my_accounts.portfolio_accounts())
 
-print(my_accounts.portfolio_positions('U5531042'))
+print(my_accounts.portfolio_positions('73340487'))
