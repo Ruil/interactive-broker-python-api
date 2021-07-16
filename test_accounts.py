@@ -1,6 +1,5 @@
 import ibw.accounts as accounts
 
-
 my_accounts = accounts.IBAccounts()
 print(my_accounts.server_accounts())
 
