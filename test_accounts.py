@@ -1,10 +1,10 @@
 import ibw.accounts as accounts
 
 my_accounts = accounts.IBAccounts()
-print(my_accounts.server_accounts())
+print('server_accounts: ', my_accounts.server_accounts())
 
-print(my_accounts.portfolio_accounts())
+print('portfolio_accounts: ', my_accounts.portfolio_accounts())
 
-print(my_accounts.portfolio_positions('73340487'))
+print('Position is: ', my_accounts.portfolio_positions('73340487'))
 
 
