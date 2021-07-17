@@ -236,9 +236,9 @@ class IBClient(client_base.IBBase):
             )
             )
             )
-            #user_input = input(
-            #    'Would you like to make an authenticated request (Press ENTER)? '
-            #).upper()
+            user_input = input(
+                'Would you like to make an authenticated request (Press ENTER)? '
+            ).upper()
 
             # Check the auth status
             auth_status = self._check_authentication_user_input()
